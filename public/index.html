@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planejamento AACUF</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="/styles/style.css" />
+</head>
+<body>
+  <main>
+    <img src="Brasao.png" alt="Pinguim" class="mascote">
+    <h1>Planejamento</h1>
+    <section id="categorias">
+      <div class="categoria" data-categoria="Esportes">
+        <h2 onclick="toggleCategoria(this)">
+          <i class="ph ph-volleyball"></i> Esportes <i class="ph ph-caret-down seta"></i>
+        </h2>
+        <div class="conteudo"><ul id="lista-Esportes"></ul></div>
+      </div>
+
+      <div class="categoria" data-categoria="Eventos">
+        <h2 onclick="toggleCategoria(this)">
+          <i class="ph ph-confetti"></i> Eventos <i class="ph ph-caret-down seta"></i>
+        </h2>
+        <div class="conteudo"><ul id="lista-Eventos"></ul></div>
+      </div>
+
+      <div class="categoria" data-categoria="Financeiro">
+        <h2 onclick="toggleCategoria(this)">
+          <i class="ph ph-wallet"></i> Financeiro <i class="ph ph-caret-down seta"></i>
+        </h2>
+        <div class="conteudo"><ul id="lista-Financeiro"></ul></div>
+      </div>
+
+      <div class="categoria" data-categoria="Marketing">
+        <h2 onclick="toggleCategoria(this)">
+          <i class="ph ph-megaphone"></i> Marketing <i class="ph ph-caret-down seta"></i>
+        </h2>
+        <div class="conteudo"><ul id="lista-Marketing"></ul></div>
+      </div>
+
+      <div class="categoria" data-categoria="Produtos">
+        <h2 onclick="toggleCategoria(this)">
+          <i class="ph ph-shopping-bag"></i> Produtos <i class="ph ph-caret-down seta"></i>
+        </h2>
+        <div class="conteudo"><ul id="lista-Produtos"></ul></div>
+      </div>
+
+      <div class="categoria" data-categoria="Outros">
+        <h2 onclick="toggleCategoria(this)">
+          <i class="ph ph-note-pencil"></i> Outros <i class="ph ph-caret-down seta"></i>
+        </h2>
+        <div class="conteudo"><ul id="lista-Outros"></ul></div>
+      </div>
+      
+    </section>
+
+    <h1>Adicionar novo item</h1>
+    <section id="formulario">
+      <div class="campo">
+        <i class="ph ph-pencil-simple"></i>
+        <input type="text" id="texto" placeholder="Digite o item a adicionar..." />
+      </div>
+      <div class="campo">
+        <i class="ph ph-tag"></i>
+        <select id="categoria">
+          <option value="Esportes">Esportes</option>
+          <option value="Eventos">Eventos</option>
+          <option value="Financeiro">Financeiro</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Produtos">Produtos</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
+      <button onclick="adicionarTexto()">
+        <i class="ph ph-check"></i>
+      </button>
+    </section>
+    <script src="/script.js"></script>
+  </main>
+</body>
+</html>
