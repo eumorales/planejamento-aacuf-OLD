@@ -268,3 +268,86 @@ async function carregarTextos() {
 document.addEventListener('DOMContentLoaded', () => {
   carregarTextos();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  carregarTextos();
+
+  const exportarBtn = document.getElementById("btnExportarPDF");
+  if (exportarBtn) {
+    exportarBtn.addEventListener("click", exportarParaPDF);
+  }
+});
+
+function exportarParaPDF() {
+  fetch("/api/listar")
+    .then(res => res.json())
+    .then(data => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 20;
+
+      // 🧡 Título AACUF centralizado
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(28);
+      const title = "AACUF";
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const textWidth = doc.getTextWidth(title);
+      doc.text(title, (pageWidth - textWidth) / 2, y);
+      y += 12;
+
+      // Subtítulo
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text("Tarefas Pendentes", 10, y);
+      y += 10;
+
+      const categoriaCores = {
+        Esportes: [23, 162, 184],
+        Eventos: [255, 152, 0],
+        Financeiro: [46, 125, 50],
+        Marketing: [156, 39, 176],
+        Produtos: [33, 150, 243],
+        Outros: [204, 204, 204]
+      };
+
+      Object.entries(data).forEach(([categoria, tarefas]) => {
+        const pendentes = tarefas.filter(t => !t.concluido);
+        if (pendentes.length === 0) return;
+
+        // Capitalizar categoria
+        const categoriaFormatada = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+        const cor = categoriaCores[categoriaFormatada] || [0, 0, 0];
+
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...cor);
+        doc.text(categoriaFormatada, 10, y);
+        y += 6;
+
+        pendentes.forEach(item => {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(11);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`• ${item.texto}`, 14, y);
+          y += 5;
+
+          if (item.dataLimite) {
+            doc.setFontSize(10);
+            doc.text(`Data limite: ${item.dataLimite}`, 18, y);
+            y += 4;
+          }
+
+          if (item.encarregados?.length) {
+            doc.text(`Encarregado(s): ${item.encarregados.join(", ")}`, 18, y);
+            y += 4;
+          }
+
+          y += 4;
+        });
+
+        y += 6;
+      });
+
+      doc.save("tarefas_pendentes_aacuf.pdf");
+    });
+}
