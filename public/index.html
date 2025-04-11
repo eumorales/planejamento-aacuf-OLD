@@ -9,8 +9,11 @@
 </head>
 <body>
   <main>
-    <img src="Brasao.png" alt="Pinguim" class="mascote">
-    <h1>Sistema de Planejamento</h1>
+    <nav class="navbar">
+      <span class="titulo-navbar">@AACUF</span>
+      <img src="Mascote.png" alt="Pinguim" class="mascote-navbar" />
+    </nav>
+    
 
     <!-- Próximo planejamento -->
     <section id="proximo">
@@ -67,7 +70,6 @@
 
     <!-- Formulário -->
     <section id="formulario">
-      <h1>Novo item</h1>
       <div class="campo">
         <i class="ph ph-tag"></i>
         <select id="categoria">
@@ -97,15 +99,22 @@
         <input type="text" id="encarregados" placeholder="Encarregado(s) (separar por vírgula)" />
       </div>
       <button onclick="adicionarTexto()">
-        <i class="ph ph-plus"></i> Adicionar
+        <i class="ph ph-plus"></i> Adicionar novo item
       </button>
     </section>
 
     <div class="exportar-wrapper">
       <button id="btnExportarPDF">
         <i class="ph ph-file-pdf"></i> Exportar Tarefas Pendentes (PDF)
+      </button>      
+    </div>
+
+    <div id="debug" style="margin-top: 24px; text-align: center;">
+      <button id="btnResetarBanco" class="debug-btn">
+        🧹
       </button>
     </div>
+    
 
     <div id="toast-container"></div>
 

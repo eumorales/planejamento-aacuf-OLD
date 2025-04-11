@@ -1,3 +1,17 @@
+document.getElementById("btnResetarBanco")?.addEventListener("click", async () => {
+  if (confirm("Tem certeza que deseja apagar todos os dados do banco?")) {
+    const res = await fetch("/api/resetar", { method: "DELETE" });
+
+    if (res.ok) {
+      mostrarToast("Banco de dados resetado com sucesso.");
+      carregarTextos();
+    } else {
+      mostrarToast("Erro ao resetar banco.", "error");
+    }
+  }
+});
+
+
 function toggleCategoria(header) {
   const categoriaDiv = header.parentElement;
   const conteudo = categoriaDiv.querySelector(".conteudo");
@@ -326,6 +340,17 @@ async function carregarTextos() {
       }
     });
 
+    const exportarBtn = document.getElementById("btnExportarPDF");
+
+    if (exportarBtn) {
+      const temPendentes = Object.values(data).some(lista =>
+        lista.some(item => !item.concluido)
+      );
+    
+      exportarBtn.disabled = !temPendentes;
+      exportarBtn.style.opacity = temPendentes ? "1" : "0.5";
+      exportarBtn.style.cursor = temPendentes ? "pointer" : "not-allowed";
+    }
     atualizarProximoPlanejamento(proximos);
   } catch (error) {
     console.error("Erro ao carregar textos:", error);
@@ -355,6 +380,15 @@ function exportarParaPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       let y = 20;
+
+      const pendentesExistem = Object.values(data).some(lista =>
+        lista.some(item => !item.concluido)
+      );
+      
+      if (!pendentesExistem) {
+        alert("Não há tarefas pendentes.");
+        return;
+      }
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(28);

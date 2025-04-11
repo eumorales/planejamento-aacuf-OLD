@@ -35,7 +35,7 @@ main {
 .mascote {
   display: block;
   margin: 0 auto 16px auto;
-  width: 80px;
+  width: 30%;
 }
 
 h1 {
@@ -400,19 +400,61 @@ li {
   to { opacity: 0; transform: translateY(20px); }
 }
 
+#btnExportarPDF:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: white;
+  border-bottom: 1px solid var(--borda);
+  margin-bottom: 20px;
+}
+
+.mascote-navbar {
+  width: 42px;
+  height: auto;
+  transition: transform 0.2s ease;
+}
+
+.mascote-navbar:hover {
+  transform: scale(1.05);
+}
+
+.titulo-navbar {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.debug-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.debug-btn:hover {
+  background-color: #c0392b;
+}
 
 
 @media (max-width: 600px) {
   body {
     padding: 16px;
+    padding-bottom: 60px;
   }
 
   h1 {
     font-size: 22px;
-  }
-
-  .mascote {
-    width: 60px;
   }
 
   #formulario {
@@ -423,5 +465,24 @@ li {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  .exportar-wrapper {
+    margin-top: 16px;
+  }
+
+  #formulario button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .footer {
+    position: fixed;
+    padding: 12px 0;
+  }
+
+  .toast {
+    bottom: auto;
+    top: 20px;
+    right: 20px;
   }
 }

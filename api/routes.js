@@ -96,4 +96,13 @@ router.delete("/deletar/:id", async (req, res) => {
   }
 });
 
+router.delete("/resetar", async (req, res) => {
+  try {
+    await Item.deleteMany({});
+    res.status(200).json({ mensagem: "Banco de dados resetado com sucesso." });
+  } catch (err) {
+    res.status(500).json({ erro: "Erro ao resetar banco de dados." });
+  }
+});
+
 module.exports = router;
