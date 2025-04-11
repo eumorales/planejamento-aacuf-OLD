@@ -19,33 +19,23 @@ function atualizarAlturaCategoria(li) {
 async function adicionarTexto() {
   const texto = document.getElementById("texto").value.trim();
   const categoria = document.getElementById("categoria").value;
-  const descricao = prompt("Digite uma descrição para o item:");
+  const dataLimite = document.getElementById("dataLimite")?.value?.trim();
+  const descricao = prompt("Informe uma descrição para o item:");
 
   if (!texto) {
-    return alert("Digite o texto do item.");
+    return alert("Informe o texto do item:");
   }
 
   const response = await fetch("/api/adicionar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto, categoria, descricao }),
+    body: JSON.stringify({ texto, categoria, descricao, dataLimite }),
   });
 
   if (response.ok) {
-    const itemSalvo = await response.json();
-    const ul = document.getElementById(`lista-${categoria}`);
-    const li = criarItemElemento(itemSalvo.texto, itemSalvo.descricao || "", itemSalvo._id, []);
-    ul.appendChild(li);
-    atualizarAlturaCategoria(li);
     document.getElementById("texto").value = "";
-
-    const categoriaDiv = document.querySelector(`[data-categoria="${categoria}"]`);
-    categoriaDiv.classList.remove("vazia");
-    categoriaDiv.querySelector("h2").style.pointerEvents = "auto";
-
-    if (!categoriaDiv.classList.contains("ativa")) {
-      toggleCategoria(categoriaDiv.querySelector("h2"));
-    }
+    if (document.getElementById("dataLimite")) document.getElementById("dataLimite").value = "";
+    carregarTextos();
   } else {
     alert("Erro ao adicionar item.");
   }
@@ -68,7 +58,7 @@ function criarElementoAnotacao(anotacao, li) {
   return noteElement;
 }
 
-function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluido = false) {
+function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluido = false, dataLimite = null) {
   const li = document.createElement("li");
   if (id) li.dataset.id = id;
 
@@ -83,6 +73,7 @@ function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluid
     </div>
     <div class="item-description">${descricao || "Sem descrição"}</div>
     <div class="item-notes"></div>
+    ${dataLimite ? `<div class="item-date"><small><i>${dataLimite}</i></small></div>` : ""}
   `;
 
   const notesContainer = li.querySelector('.item-notes');
@@ -116,12 +107,13 @@ async function salvarItemAtualizado(li) {
 
   const texto = li.querySelector('.item-text').textContent;
   const descricao = li.querySelector('.item-description').textContent;
+  const dataLimite = li.querySelector('.item-date')?.textContent.replace("📅 ", "").trim();
   const anotacoes = Array.from(li.querySelectorAll('.note')).map(n => n.firstChild.textContent.trim());
 
   await fetch(`/api/atualizar/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto, descricao, anotacoes }),
+    body: JSON.stringify({ texto, descricao, anotacoes, dataLimite }),
   });
 }
 
@@ -141,16 +133,12 @@ function editarItem(li) {
   const descricaoElement = li.querySelector('.item-description');
 
   const novoTexto = prompt("Editar texto:", textoElement.textContent);
-  if (novoTexto !== null) {
-    textoElement.textContent = novoTexto;
-  }
+  if (novoTexto !== null) textoElement.textContent = novoTexto;
 
   const novaDescricao = prompt("Editar descrição:", descricaoElement.textContent);
-  if (novaDescricao !== null) {
-    descricaoElement.textContent = novaDescricao || "Sem descrição";
-    atualizarAlturaCategoria(li);
-  }
+  if (novaDescricao !== null) descricaoElement.textContent = novaDescricao || "Sem descrição";
 
+  atualizarAlturaCategoria(li);
   salvarItemAtualizado(li);
 }
 
@@ -183,17 +171,12 @@ async function deletarItem(li) {
     if (res.ok) {
       const ul = li.parentElement;
       li.remove();
-
-      // Aguarda a remoção DOM para verificar corretamente
-      setTimeout(() => {
-        verificarCategoriaVazia(ul);
-      }, 0);
+      setTimeout(() => verificarCategoriaVazia(ul), 0);
     } else {
       alert("Erro ao excluir item");
     }
   }
 }
-
 
 function verificarCategoriaVazia(ul) {
   const categoriaDiv = ul.closest('.categoria');
@@ -206,10 +189,33 @@ function verificarCategoriaVazia(ul) {
   }
 }
 
+function atualizarProximoPlanejamento(lista) {
+  const container = document.getElementById("proximo-planejamento");
+  if (!container) return;
+
+  if (!lista.length) {
+    container.innerHTML = "<p>Nenhum planejamento pendente.</p>";
+    return;
+  }
+
+  lista.sort((a, b) => {
+    const [da, ma, aa] = a.dataLimite.split("/").map(Number);
+    const [db, mb, ab] = b.dataLimite.split("/").map(Number);
+    return new Date(aa, ma - 1, da) - new Date(ab, mb - 1, db);
+  });
+
+  const proximo = lista[0];
+  container.innerHTML = `
+    <strong>${proximo.texto}</strong><br>
+    <small>${proximo.dataLimite}</small>
+  `;
+}
+
 async function carregarTextos() {
   try {
     const res = await fetch("/api/listar");
     const data = await res.json();
+    const proximos = [];
 
     document.querySelectorAll(".categoria").forEach((categoriaDiv) => {
       const categoria = categoriaDiv.dataset.categoria;
@@ -218,7 +224,24 @@ async function carregarTextos() {
 
       if (data[categoria] && data[categoria].length > 0) {
         data[categoria].forEach((item) => {
-          const li = criarItemElemento(item.texto, item.descricao || "", item._id, item.anotacoes || [], item.concluido);
+          // Verifica vencimento
+          let vencido = false;
+          if (item.dataLimite) {
+            const [d, m, a] = item.dataLimite.split("/").map(Number);
+            const dataItem = new Date(a, m - 1, d);
+            const hoje = new Date();
+            if (dataItem < hoje) vencido = true;
+            if (!item.concluido && dataItem >= hoje) proximos.push(item);
+          }
+
+          const li = criarItemElemento(
+            item.texto,
+            item.descricao || "",
+            item._id,
+            item.anotacoes || [],
+            item.concluido || vencido,
+            item.dataLimite
+          );
           ul.appendChild(li);
         });
         categoriaDiv.classList.remove("vazia");
@@ -228,6 +251,8 @@ async function carregarTextos() {
         categoriaDiv.querySelector("h2").style.pointerEvents = "none";
       }
     });
+
+    atualizarProximoPlanejamento(proximos);
   } catch (error) {
     console.error("Erro ao carregar textos:", error);
   }

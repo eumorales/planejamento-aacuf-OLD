@@ -11,43 +11,53 @@
   <main>
     <img src="Brasao.png" alt="Pinguim" class="mascote">
     <h1>Sistema de Planejamento</h1>
+
+    <!-- Próximo planejamento -->
+    <section id="proximo">
+      <h2>📅 Próximo Planejamento</h2>
+      <div id="proximo-planejamento" class="proximo-box">
+        <p>Nenhum planejamento pendente.</p>
+      </div>
+    </section>
+
+    <!-- Categorias -->
     <section id="categorias">
-      <div class="categoria" data-categoria="Esportes">
+      <div class="categoria categoria-esportes" data-categoria="Esportes">
         <h2 onclick="toggleCategoria(this)">
           <i class="ph ph-volleyball"></i> Esportes <i class="ph ph-caret-down seta"></i>
         </h2>
         <div class="conteudo"><ul id="lista-Esportes"></ul></div>
       </div>
 
-      <div class="categoria" data-categoria="Eventos">
+      <div class="categoria categoria-eventos" data-categoria="Eventos">
         <h2 onclick="toggleCategoria(this)">
           <i class="ph ph-confetti"></i> Eventos <i class="ph ph-caret-down seta"></i>
         </h2>
         <div class="conteudo"><ul id="lista-Eventos"></ul></div>
       </div>
 
-      <div class="categoria" data-categoria="Financeiro">
+      <div class="categoria categoria-financeiro" data-categoria="Financeiro">
         <h2 onclick="toggleCategoria(this)">
           <i class="ph ph-wallet"></i> Financeiro <i class="ph ph-caret-down seta"></i>
         </h2>
         <div class="conteudo"><ul id="lista-Financeiro"></ul></div>
       </div>
 
-      <div class="categoria" data-categoria="Marketing">
+      <div class="categoria categoria-marketing" data-categoria="Marketing">
         <h2 onclick="toggleCategoria(this)">
           <i class="ph ph-megaphone"></i> Marketing <i class="ph ph-caret-down seta"></i>
         </h2>
         <div class="conteudo"><ul id="lista-Marketing"></ul></div>
       </div>
 
-      <div class="categoria" data-categoria="Produtos">
+      <div class="categoria categoria-produtos" data-categoria="Produtos">
         <h2 onclick="toggleCategoria(this)">
           <i class="ph ph-shopping-bag"></i> Produtos <i class="ph ph-caret-down seta"></i>
         </h2>
         <div class="conteudo"><ul id="lista-Produtos"></ul></div>
       </div>
 
-      <div class="categoria" data-categoria="Outros">
+      <div class="categoria categoria-outros" data-categoria="Outros">
         <h2 onclick="toggleCategoria(this)">
           <i class="ph ph-note-pencil"></i> Outros <i class="ph ph-caret-down seta"></i>
         </h2>
@@ -55,10 +65,12 @@
       </div>
     </section>
 
+    <!-- Formulário -->
     <section id="formulario">
+      <h1>Novo item</h1>
       <div class="campo">
         <i class="ph ph-pencil-simple"></i>
-        <input type="text" id="texto" placeholder="Digite o item a adicionar..." />
+        <input type="text" id="texto" placeholder="Nome do item" />
       </div>
       <div class="campo">
         <i class="ph ph-tag"></i>
@@ -71,10 +83,15 @@
           <option value="Outros">Outros</option>
         </select>
       </div>
+      <div class="campo">
+        <i class="ph ph-calendar-blank"></i>
+        <input type="text" id="dataLimite" placeholder="Data limite (dd/mm/aaaa)" />
+      </div>
       <button onclick="adicionarTexto()">
         <i class="ph ph-plus"></i> Adicionar
       </button>
     </section>
+
     <script src="/script.js"></script>
   </main>
 </body>
