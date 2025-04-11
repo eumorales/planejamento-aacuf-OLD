@@ -28,33 +28,53 @@ function mostrarToast(mensagem, tipo = "success") {
   }, 3000);
 }
 
-
 async function adicionarTexto() {
   const texto = document.getElementById("texto").value.trim();
-  const categoria = document.getElementById("categoria").value;
-  const dataLimite = document.getElementById("dataLimite")?.value?.trim();
+  const categoria = document.getElementById("categoria").value.trim();
+  const dataLimite = document.getElementById("dataLimite").value.trim();
   const encarregadosInput = document.getElementById("encarregados")?.value?.trim();
-  const encarregados = encarregadosInput ? encarregadosInput.split(",").map(e => e.trim()) : [];
   const descricao = document.getElementById("descricao")?.value?.trim();
 
-  if (!texto) return alert("Informe o texto do item:");
+  // Verifica se os campos obrigatórios foram preenchidos
+  if (!texto || !categoria || !dataLimite) {
+    mostrarToast("Preencha todos os campos obrigatórios!", "error");
+    return;
+  }
+
+  const regexData = /^\d{2}\/\d{2}\/\d{4}$/;
+  if (!regexData.test(dataLimite)) {
+    mostrarToast("Formato de data inválido. Use: dia/mês/ano", "error");
+    return;
+  }
+
+  const encarregados = encarregadosInput
+    ? encarregadosInput.split(",").map(e => e.trim())
+    : [];
 
   const response = await fetch("/api/adicionar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto, categoria, descricao, dataLimite, encarregados })
+    body: JSON.stringify({
+      texto,
+      categoria,
+      descricao,
+      dataLimite,
+      encarregados,
+    }),
   });
 
   if (response.ok) {
     document.getElementById("texto").value = "";
-    if (document.getElementById("dataLimite")) document.getElementById("dataLimite").value = "";
+    document.getElementById("dataLimite").value = "";
     if (document.getElementById("descricao")) document.getElementById("descricao").value = "";
     if (document.getElementById("encarregados")) document.getElementById("encarregados").value = "";
     carregarTextos();
+    mostrarToast("Item adicionado!");
   } else {
-    alert("Erro ao adicionar item.");
+    mostrarToast("Erro ao adicionar item.", "error");
   }
 }
+
 
 function criarElementoAnotacao(anotacao, li) {
   const noteElement = document.createElement('div');
@@ -124,10 +144,6 @@ function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluid
     actions.querySelector(".btn-delete").addEventListener("click", () => deletarItem(li));
   }
   
-  mostrarToast("Item adicionado!");
-
-  
-
   return li;
 }
 
