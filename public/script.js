@@ -16,6 +16,19 @@ function atualizarAlturaCategoria(li) {
   conteudo.style.maxHeight = conteudo.scrollHeight + "px";
 }
 
+function mostrarToast(mensagem, tipo = "success") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = "toast" + (tipo === "error" ? " error" : "");
+  toast.innerHTML = `<i class="ph ph-check-circle"></i> ${mensagem}`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+
 async function adicionarTexto() {
   const texto = document.getElementById("texto").value.trim();
   const categoria = document.getElementById("categoria").value;
@@ -53,6 +66,7 @@ function criarElementoAnotacao(anotacao, li) {
     </div>
   `;
   noteElement.querySelector('.btn-remove-note').addEventListener('click', async () => {
+    mostrarToast("Anotação removida.");
     noteElement.remove();
     atualizarAlturaCategoria(li);
     await salvarItemAtualizado(li);
@@ -94,16 +108,25 @@ function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluid
   li.querySelector('.btn-note').addEventListener('click', () => adicionarAnotacao(li));
   li.querySelector('.btn-done').addEventListener('click', () => concluirItem(li));
 
-  if (concluido) {
-    li.style.opacity = '0.5';
-    li.style.textDecoration = 'line-through';
-    li.querySelector('.item-actions').innerHTML = `
+  if (concluido === "expirado") {
+    li.classList.add("item-expirado");
+  } else if (concluido === true) {
+    li.classList.add("item-concluido");
+    li.classList.remove("item-expirado");
+  
+    const actions = li.querySelector('.item-actions');
+    actions.innerHTML = `
       <button class="btn-undo"><i class="ph ph-arrow-counter-clockwise"></i></button>
       <button class="btn-delete"><i class="ph ph-trash"></i></button>
     `;
-    li.querySelector('.btn-undo').addEventListener('click', () => carregarTextos());
-    li.querySelector('.btn-delete').addEventListener('click', () => deletarItem(li));
+  
+    actions.querySelector(".btn-undo").addEventListener("click", () => carregarTextos());
+    actions.querySelector(".btn-delete").addEventListener("click", () => deletarItem(li));
   }
+  
+  mostrarToast("Item adicionado!");
+
+  
 
   return li;
 }
@@ -123,6 +146,9 @@ async function salvarItemAtualizado(li) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ texto, descricao, anotacoes, dataLimite, encarregados })
   });
+
+  mostrarToast("Item atualizado!");
+
 }
 
 async function adicionarAnotacao(li) {
@@ -133,6 +159,8 @@ async function adicionarAnotacao(li) {
     notesContainer.appendChild(noteElement);
     atualizarAlturaCategoria(li);
     await salvarItemAtualizado(li);
+    mostrarToast("Anotação salva!");
+
   }
 }
 
@@ -158,15 +186,19 @@ async function concluirItem(li) {
 
     await fetch(`/api/concluir/${id}`, { method: "PUT" });
 
-    li.style.opacity = '0.5';
-    li.style.textDecoration = 'line-through';
+    li.classList.add("item-concluido");
+    li.classList.remove("item-expirado"); 
     li.querySelector('.item-actions').innerHTML = `
       <button class="btn-undo"><i class="ph ph-arrow-counter-clockwise"></i></button>
       <button class="btn-delete"><i class="ph ph-trash"></i></button>
     `;
+    
 
     li.querySelector('.btn-undo').addEventListener('click', () => carregarTextos());
     li.querySelector('.btn-delete').addEventListener('click', () => deletarItem(li));
+
+    mostrarToast("Item concluído!");
+
   }
 }
 
@@ -177,6 +209,7 @@ async function deletarItem(li) {
     if (res.ok) {
       const ul = li.parentElement;
       li.remove();
+      mostrarToast("Item removido!");
       setTimeout(() => verificarCategoriaVazia(ul), 0);
     } else {
       alert("Erro ao excluir item");
@@ -186,14 +219,19 @@ async function deletarItem(li) {
 
 function verificarCategoriaVazia(ul) {
   const categoriaDiv = ul.closest('.categoria');
+  const conteudo = categoriaDiv.querySelector('.conteudo');
+
   if (!ul.children.length) {
     categoriaDiv.classList.add('vazia');
+    categoriaDiv.classList.remove('ativa');
+    conteudo.style.maxHeight = "0px";
     categoriaDiv.querySelector('h2').style.pointerEvents = 'none';
   } else {
     categoriaDiv.classList.remove('vazia');
     categoriaDiv.querySelector('h2').style.pointerEvents = 'auto';
   }
 }
+
 
 function atualizarProximoPlanejamento(lista) {
   const container = document.getElementById("proximo-planejamento");
@@ -231,13 +269,24 @@ async function carregarTextos() {
 
       if (data[categoria] && data[categoria].length > 0) {
         data[categoria].forEach((item) => {
+          let status = false;
           let vencido = false;
+
           if (item.dataLimite) {
             const [d, m, a] = item.dataLimite.split("/").map(Number);
             const dataItem = new Date(a, m - 1, d);
             const hoje = new Date();
-            if (dataItem < hoje) vencido = true;
-            if (!item.concluido && dataItem >= hoje) proximos.push(item);
+
+            if (dataItem < hoje && !item.concluido) {
+              vencido = true;
+              status = "expirado";
+            } else if (!item.concluido) {
+              proximos.push(item);
+            }
+          }
+
+          if (item.concluido) {
+            status = true;
           }
 
           const li = criarItemElemento(
@@ -245,12 +294,14 @@ async function carregarTextos() {
             item.descricao || "",
             item._id,
             item.anotacoes || [],
-            item.concluido || vencido,
+            status,
             item.dataLimite,
             item.encarregados || []
           );
+
           ul.appendChild(li);
         });
+
         categoriaDiv.classList.remove("vazia");
         categoriaDiv.querySelector("h2").style.pointerEvents = "auto";
       } else {
@@ -262,8 +313,11 @@ async function carregarTextos() {
     atualizarProximoPlanejamento(proximos);
   } catch (error) {
     console.error("Erro ao carregar textos:", error);
+    mostrarToast("Ocorreu um erro!", error);
+
   }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   carregarTextos();
@@ -286,7 +340,6 @@ function exportarParaPDF() {
       const doc = new jsPDF();
       let y = 20;
 
-      // 🧡 Título AACUF centralizado
       doc.setFont("helvetica", "bold");
       doc.setFontSize(28);
       const title = "AACUF";
@@ -295,7 +348,6 @@ function exportarParaPDF() {
       doc.text(title, (pageWidth - textWidth) / 2, y);
       y += 12;
 
-      // Subtítulo
       doc.setFontSize(16);
       doc.setTextColor(0, 0, 0);
       doc.text("Tarefas Pendentes", 10, y);
@@ -314,7 +366,6 @@ function exportarParaPDF() {
         const pendentes = tarefas.filter(t => !t.concluido);
         if (pendentes.length === 0) return;
 
-        // Capitalizar categoria
         const categoriaFormatada = categoria.charAt(0).toUpperCase() + categoria.slice(1);
         const cor = categoriaCores[categoriaFormatada] || [0, 0, 0];
 
@@ -349,5 +400,7 @@ function exportarParaPDF() {
       });
 
       doc.save("tarefas_pendentes_aacuf.pdf");
+      mostrarToast("Documento salvo!");
+
     });
 }

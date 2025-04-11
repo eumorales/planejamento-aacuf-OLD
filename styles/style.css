@@ -347,6 +347,58 @@ li {
   opacity: 1;
 }
 
+.item-expirado {
+  text-decoration: line-through;
+  color: red;
+  opacity: 0.7;
+}
+
+.item-concluido {
+  text-decoration: line-through;
+  color: green;
+  opacity: 0.7;
+}
+
+#toast-container {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast {
+  background-color: #2ecc71;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+.toast.error {
+  background-color: #e74c3c;
+}
+
+.toast i {
+  font-size: 18px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(20px); }
+}
+
 
 
 @media (max-width: 600px) {
