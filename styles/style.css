@@ -87,13 +87,37 @@ section#proximo {
   color: var(--cinza);
 }
 
-#formulario input,
-#formulario select {
+#formulario input {
   border: none;
   outline: none;
   background: transparent;
   font-size: 15px;
   width: 100%;
+}
+
+#formulario select {
+  border: none !important;
+  outline: none !important;
+  background: transparent;
+  font-size: 15px;
+  width: 100%;
+  box-shadow: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath fill='%23999' d='M7 10L0 0h14z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 10px;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+#formulario select:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 #formulario button {
@@ -117,63 +141,74 @@ section#proximo {
 }
 
 .categoria {
-  background: white;
   margin-bottom: 16px;
   border-radius: 8px;
   border: 1px solid var(--borda);
   overflow: hidden;
 }
 
-.categoria.vazia {
-  background-color: var(--secundaria);
-  color: var(--cinza);
-}
-
 .categoria h2 {
-  cursor: pointer;
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: 600;
-  border-bottom: 1px solid var(--borda);
+  cursor: pointer;
 }
 
-/* Cores personalizadas por categoria */
-.categoria-esportes h2 {
+.categoria .conteudo {
+  background: white;
+  padding: 0 16px;
+}
+
+.categoria-esportes {
   background-color: #e8f6f8;
   border-left: 5px solid var(--ciano);
 }
 
-.categoria-eventos h2 {
+.categoria-eventos {
   background-color: #fff3e0;
   border-left: 5px solid var(--laranja);
 }
 
-.categoria-financeiro h2 {
+.categoria-financeiro {
   background-color: #e9f7ef;
   border-left: 5px solid var(--verde);
 }
 
-.categoria-marketing h2 {
+.categoria-marketing {
   background-color: #f3e5f5;
   border-left: 5px solid var(--roxo);
 }
 
-.categoria-produtos h2 {
+.categoria-produtos {
   background-color: #e3f2fd;
   border-left: 5px solid var(--azul);
 }
 
-.categoria-outros h2 {
+.categoria-outros {
   background-color: #ffffff;
   border-left: 5px solid #ccc;
 }
 
-.categoria.vazia h2 {
-  background-color: #f0f0f0;
+.categoria.vazia {
+  background-color: #f0f0f0 !important;
   color: var(--cinza);
-  border-left: 5px solid #ccc;
+}
+.categoria.vazia h2 {
+  pointer-events: none;
+  color: var(--cinza);
+}
+
+.seta {
+  transition: transform 0.3s ease;
+}
+.categoria.ativa .seta {
+  transform: rotate(180deg);
+}
+.categoria.ativa .conteudo {
+  max-height: 2000px;
+  padding-bottom: 16px;
 }
 
 .seta {
@@ -287,3 +322,11 @@ li {
     gap: 8px;
   }
 }
+"""
+
+# Salvar como arquivo
+from pathlib import Path
+
+path = Path("/mnt/data/style.css")
+path.write_text(css_conteudo, encoding="utf-8")
+path

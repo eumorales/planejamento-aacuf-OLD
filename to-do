@@ -1,3 +1,26 @@
- + Adicionar encarregado
- + Filtrar por nome (encarregado)
+ + Pequenos ajustes css
+ + Alterar icone encarregado para phosphor
+ + Adicione descrição no formulario
+ + Filtrar por encarregado
+ + Histórico tarefas
+ + N tarefas concluidas por usuario
+ + Expirado = vermelho | Concluido verde
+
+ 🚀 Como podemos continuar?
+Aqui vão algumas possibilidades:
+
+Adicionar novas categorias ao planejamento.
+
+Criar painel de estatísticas (quantidade por status, categoria, etc.).
+
+Autenticação de usuários (login de responsáveis).
+
+Exportar dados para PDF/Excel.
+
+Sistema de notificações para datas limite.
+
+Melhorar UI para celular/tablet.
+
+Publicar online (deploy) — exemplo: render.com, vercel, railway.app, etc.
+
 ylO0Yb0Ma98UdMni

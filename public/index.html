@@ -69,10 +69,6 @@
     <section id="formulario">
       <h1>Novo item</h1>
       <div class="campo">
-        <i class="ph ph-pencil-simple"></i>
-        <input type="text" id="texto" placeholder="Nome do item" />
-      </div>
-      <div class="campo">
         <i class="ph ph-tag"></i>
         <select id="categoria">
           <option value="Esportes">Esportes</option>
@@ -84,8 +80,21 @@
         </select>
       </div>
       <div class="campo">
+        <i class="ph ph-pencil-simple"></i>
+        <input type="text" id="texto" placeholder="Nome do item" />
+      </div>
+      <div class="campo">
+        <i class="ph ph-align-left"></i>
+        <input type="text" id="descricao" placeholder="Descrição do item" />
+      </div>
+
+      <div class="campo">
         <i class="ph ph-calendar-blank"></i>
         <input type="text" id="dataLimite" placeholder="Data limite (dd/mm/aaaa)" />
+      </div>
+      <div class="campo">
+        <i class="ph ph-user"></i>
+        <input type="text" id="encarregados" placeholder="Encarregado(s) (separar por vírgula)" />
       </div>
       <button onclick="adicionarTexto()">
         <i class="ph ph-plus"></i> Adicionar

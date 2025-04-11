@@ -20,21 +20,23 @@ async function adicionarTexto() {
   const texto = document.getElementById("texto").value.trim();
   const categoria = document.getElementById("categoria").value;
   const dataLimite = document.getElementById("dataLimite")?.value?.trim();
-  const descricao = prompt("Informe uma descrição para o item:");
+  const encarregadosInput = document.getElementById("encarregados")?.value?.trim();
+  const encarregados = encarregadosInput ? encarregadosInput.split(",").map(e => e.trim()) : [];
+  const descricao = document.getElementById("descricao")?.value?.trim();
 
-  if (!texto) {
-    return alert("Informe o texto do item:");
-  }
+  if (!texto) return alert("Informe o texto do item:");
 
   const response = await fetch("/api/adicionar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto, categoria, descricao, dataLimite }),
+    body: JSON.stringify({ texto, categoria, descricao, dataLimite, encarregados })
   });
 
   if (response.ok) {
     document.getElementById("texto").value = "";
     if (document.getElementById("dataLimite")) document.getElementById("dataLimite").value = "";
+    if (document.getElementById("descricao")) document.getElementById("descricao").value = "";
+    if (document.getElementById("encarregados")) document.getElementById("encarregados").value = "";
     carregarTextos();
   } else {
     alert("Erro ao adicionar item.");
@@ -58,9 +60,14 @@ function criarElementoAnotacao(anotacao, li) {
   return noteElement;
 }
 
-function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluido = false, dataLimite = null) {
+function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluido = false, dataLimite = null, encarregados = []) {
   const li = document.createElement("li");
   if (id) li.dataset.id = id;
+
+  let encarregadosHTML = "";
+  if (encarregados.length > 0) {
+    encarregadosHTML = `<div class="item-encarregados"><i class='ph ph-user'></i> ${encarregados.join(", ")}</div>`;
+  }
 
   li.innerHTML = `
     <div class="item-header">
@@ -72,8 +79,9 @@ function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluid
       </div>
     </div>
     <div class="item-description">${descricao || "Sem descrição"}</div>
-    <div class="item-notes"></div>
     ${dataLimite ? `<div class="item-date"><small><i>${dataLimite}</i></small></div>` : ""}
+    ${encarregadosHTML}
+    <div class="item-notes"></div>
   `;
 
   const notesContainer = li.querySelector('.item-notes');
@@ -93,7 +101,6 @@ function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluid
       <button class="btn-undo"><i class="ph ph-arrow-counter-clockwise"></i></button>
       <button class="btn-delete"><i class="ph ph-trash"></i></button>
     `;
-
     li.querySelector('.btn-undo').addEventListener('click', () => carregarTextos());
     li.querySelector('.btn-delete').addEventListener('click', () => deletarItem(li));
   }
@@ -107,13 +114,14 @@ async function salvarItemAtualizado(li) {
 
   const texto = li.querySelector('.item-text').textContent;
   const descricao = li.querySelector('.item-description').textContent;
-  const dataLimite = li.querySelector('.item-date')?.textContent.replace("📅 ", "").trim();
+  const dataLimite = li.querySelector('.item-date')?.textContent?.trim();
+  const encarregados = li.querySelector('.item-encarregados')?.textContent?.replace("👤", "").replace("\u{1F464}", "").replace(/\s+/g, " ").trim().split(',').map(e => e.trim()) || [];
   const anotacoes = Array.from(li.querySelectorAll('.note')).map(n => n.firstChild.textContent.trim());
 
   await fetch(`/api/atualizar/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto, descricao, anotacoes, dataLimite }),
+    body: JSON.stringify({ texto, descricao, anotacoes, dataLimite, encarregados })
   });
 }
 
@@ -165,9 +173,7 @@ async function concluirItem(li) {
 async function deletarItem(li) {
   const id = li.dataset.id;
   if (confirm("Excluir permanentemente este item?")) {
-    const res = await fetch(`/api/deletar/${id}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(`/api/deletar/${id}`, { method: "DELETE" });
     if (res.ok) {
       const ul = li.parentElement;
       li.remove();
@@ -207,7 +213,8 @@ function atualizarProximoPlanejamento(lista) {
   const proximo = lista[0];
   container.innerHTML = `
     <strong>${proximo.texto}</strong><br>
-    <small>${proximo.dataLimite}</small>
+    <small>${proximo.dataLimite}</small><br>
+    ${proximo.encarregados?.length ? `<small><i class="ph ph-user"></i> ${proximo.encarregados.join(", ")}</small>` : ""}
   `;
 }
 
@@ -224,7 +231,6 @@ async function carregarTextos() {
 
       if (data[categoria] && data[categoria].length > 0) {
         data[categoria].forEach((item) => {
-          // Verifica vencimento
           let vencido = false;
           if (item.dataLimite) {
             const [d, m, a] = item.dataLimite.split("/").map(Number);
@@ -240,7 +246,8 @@ async function carregarTextos() {
             item._id,
             item.anotacoes || [],
             item.concluido || vencido,
-            item.dataLimite
+            item.dataLimite,
+            item.encarregados || []
           );
           ul.appendChild(li);
         });
