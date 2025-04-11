@@ -1,130 +1,130 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
+:root {
+  --azul: #007bff;
+  --azul-hover: #0056b3;
+  --cinza-claro: #f8f9fa;
+  --cinza-medio: #e0e0e0;
+  --cinza-escuro: #666;
+  --texto: #333;
+  --fundo: #fafafa;
+  --card-bg: #ffffff;
+}
+
 body {
   font-family: 'Inter', sans-serif;
-  padding: 20px;
-  background-color: #fafafa;
-  color: #333;
+  background-color: var(--fundo);
+  color: var(--texto);
   margin: 0;
+  padding: 20px;
+}
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
 }
 
 .mascote {
-  width: 10%;
+  width: 200px;
   height: auto;
-  margin: 5px auto;
-  margin-bottom: 20px;
   display: block;
+  margin: 0 auto 20px;
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 24px;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
+  margin-bottom: 30px;
 }
 
 #formulario {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin: 30px auto;
+  display: grid;
+  gap: 12px;
+  justify-content: center;
+  max-width: 400px;
+  margin: 40px auto;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 #formulario .campo {
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 320px;
 }
 
 #formulario .campo i {
   position: absolute;
   left: 12px;
   font-size: 18px;
-  color: #888;
+  color: var(--cinza-escuro);
 }
 
 #formulario input,
 #formulario select {
-  padding: 8px 12px 8px 36px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-  outline: none;
-  transition: border 0.2s ease;
   width: 100%;
+  padding: 10px 12px 10px 38px;
+  font-size: 15px;
+  border: 1px solid var(--cinza-medio);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background-color: #fff;
 }
 
 #formulario input:focus,
 #formulario select:focus {
-  border-color: #007bff;
+  border-color: var(--azul);
 }
 
 #formulario button {
-  background-color: transparent;
-  color: #007bff;
-  border: 2px solid #007bff;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: var(--azul);
+  color: white;
+  border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 320px;
-}
-
-#formulario button i {
-  font-size: 18px;
-  margin-left: 6px;
+  transition: background-color 0.2s ease;
 }
 
 #formulario button:hover {
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--azul-hover);
 }
 
-section#categorias > div {
-  background: #fff;
-  padding: 12px 16px;
-  margin: 12px auto;
-  border-radius: 8px;
-  max-width: 600px;
-  border: 1px solid #eee;
-  transition: box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-section#categorias > div:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+#categorias {
+  display: grid;
+  gap: 20px;
 }
 
 .categoria {
-  transition: opacity 0.2s ease;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--cinza-medio);
+  transition: all 0.2s ease;
 }
 
 .categoria.vazia {
-  background-color: #f5f5f5;
+  background-color: #f0f0f0;
   color: #aaa;
-  cursor: default;
-}
-
-.categoria.vazia h2 {
-  cursor: default, not-allowed;
+  pointer-events: none;
 }
 
 .categoria h2 {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 17px;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 600;
   margin: 0;
-  font-weight: 500;
   cursor: pointer;
 }
 
@@ -140,42 +140,131 @@ section#categorias > div:hover {
 .conteudo {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  transition: max-height 0.3s ease, padding 0.3s ease;
 }
 
 .categoria.ativa .conteudo {
-  max-height: 400px;
-  margin-top: 8px;
+  max-height: 1000px;
+  margin-top: 12px;
 }
 
 ul {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
   margin: 0;
 }
 
 li {
-  padding: 4px 0;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 12px 16px;
   font-size: 15px;
-  border-bottom: 1px dashed #eee;
+  margin-bottom: 10px;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-@media (max-width: 600px) {
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
 
-  .mascote {
-    width: 40%;
-  }
-  section#categorias > div {
-    padding: 10px 12px;
+.item-text {
+  font-weight: 600;
+  flex-grow: 1;
+  word-break: break-word;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.item-actions button {
+  background: none;
+  border: none;
+  color: var(--cinza-escuro);
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.item-actions button:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.item-description {
+  color: #555;
+  font-size: 14px;
+  border-left: 3px solid #eee;
+  padding-left: 10px;
+  margin-top: 4px;
+}
+
+.item-notes {
+  margin-top: 8px;
+}
+
+.note {
+  background: var(--cinza-claro);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.note-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-done {
+  color: #28a745 !important;
+}
+
+.btn-done:hover {
+  background: rgba(40, 167, 69, 0.1) !important;
+}
+
+.btn-edit {
+  color: #ffc107 !important;
+}
+
+.btn-edit:hover {
+  background: rgba(255, 193, 7, 0.1) !important;
+}
+
+.btn-note {
+  color: #17a2b8 !important;
+}
+
+.btn-note:hover {
+  background: rgba(23, 162, 184, 0.1) !important;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 24px;
   }
 
-  .categoria h2 i {
-    margin-right: 8px;
-    font-size: 20px;
-    vertical-align: middle;
+  #formulario {
+    padding: 16px;
+    margin: 20px auto;
+  }
+
+  .categoria {
+    padding: 14px 16px;
   }
 
   li {
     font-size: 14px;
+    padding: 10px 12px;
   }
 }
