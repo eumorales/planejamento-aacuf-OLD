@@ -42,7 +42,7 @@ Este é um sistema de planejamento de tarefas criado para organizar, delegar e a
 1. **Clone o repositório:**
 
 ```bash
-git clone https://github.com/seu-usuario/aacuf-planejamento.git
+git clone https://github.com/eumorales/planejamento-aacuf
 cd aacuf-planejamento
 ```
 
