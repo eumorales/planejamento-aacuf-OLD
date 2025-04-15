@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-// Esquema atualizado com dataLimite e encarregados
 const ItemSchema = new mongoose.Schema({
   texto: String,
   categoria: String,
@@ -59,7 +58,6 @@ router.get("/listar", async (req, res) => {
   }
 });
 
-// Desfazer conclusão de item
 router.put("/desfazer/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -74,8 +72,6 @@ router.put("/desfazer/:id", async (req, res) => {
   }
 });
 
-
-// Atualizar um item
 router.put("/atualizar/:id", async (req, res) => {
   const { id } = req.params;
   const { texto, descricao, anotacoes, dataLimite, encarregados } = req.body;
@@ -92,7 +88,6 @@ router.put("/atualizar/:id", async (req, res) => {
   }
 });
 
-// Marcar como concluído
 router.put("/concluir/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -107,7 +102,6 @@ router.put("/concluir/:id", async (req, res) => {
   }
 });
 
-// Deletar item
 router.delete("/deletar/:id", async (req, res) => {
   const { id } = req.params;
   try {

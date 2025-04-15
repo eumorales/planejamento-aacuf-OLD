@@ -49,13 +49,11 @@ async function adicionarTexto() {
   const descricao = document.getElementById("descricao")?.value?.trim();
   const acesso = document.getElementById("codigoAcesso")?.value.trim();
 
-  // Verifica se os campos obrigatórios foram preenchidos
   if (!texto || !categoria || !dataLimite || !acesso) {
     mostrarToast("Preencha todos os campos obrigatórios!", "error");
     return;
   }
 
-  // Validação de data (DD/MM/AAAA)
   const regexData = /^\d{2}\/\d{2}\/\d{4}$/;
   if (!regexData.test(dataLimite)) {
     mostrarToast("Formato de data inválido. Use: dia/mês/ano", "error");
@@ -134,7 +132,6 @@ function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluid
     }
   `;
 
-  // Anotações
   const notesContainer = li.querySelector('.item-notes');
   anotacoes.forEach(anotacao => {
     const noteElement = document.createElement('div');
