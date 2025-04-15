@@ -16,7 +16,6 @@ Este é um sistema de planejamento de tarefas criado para organizar, delegar e a
 - 📌 Destaque automático do **próximo planejamento**
 - 🧾 Exportar tarefas pendentes para PDF
 - 🔁 Tarefas automáticas semanais
-- 🎯 Filtro por encarregado
 - 🔔 Notificações de prazos
 - 🕒 Histórico completo de tarefas
 
