@@ -53,7 +53,7 @@ cd aacuf-planejamento
 npm install
 ```
 
-3. **Crie o .env*
+3. **Crie o .env**
 ```bash
 MONGO_URI=link_do_mongodb
 CODIGOS_ACESSO=codigo_acesso
@@ -65,6 +65,6 @@ node server.js
 ```
 
 ## 🤝 Contribuição
-Sugestões, melhorias e colaborações são bem-vindas! Entre em contato ou abra uma pull request. 💬
+Sugestões, melhorias e colaborações são bem-vindas! Entre em contato ou abra uma pull request. 
 
 
