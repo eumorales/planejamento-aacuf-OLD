@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 // Esquema atualizado com dataLimite e encarregados
 const ItemSchema = new mongoose.Schema({
@@ -15,9 +16,15 @@ const ItemSchema = new mongoose.Schema({
 
 const Item = mongoose.model("Item", ItemSchema);
 
-// Criar novo item
 router.post("/adicionar", async (req, res) => {
-  const { texto, categoria, descricao, dataLimite, encarregados } = req.body;
+  const { texto, categoria, descricao, dataLimite, encarregados, acesso } = req.body;
+
+  const codigosPermitidos = process.env.CODIGOS_ACESSO?.split(",") || [];
+
+  if (!codigosPermitidos.includes(acesso)) {
+    return res.status(403).json({ erro: "Código de acesso inválido." });
+  }
+
   try {
     const novo = new Item({
       texto,
@@ -34,7 +41,6 @@ router.post("/adicionar", async (req, res) => {
   }
 });
 
-// Listar todos os itens organizados por categoria
 router.get("/listar", async (req, res) => {
   try {
     const itens = await Item.find();
@@ -52,6 +58,22 @@ router.get("/listar", async (req, res) => {
     res.status(500).json({ erro: "Erro ao buscar itens" });
   }
 });
+
+// Desfazer conclusão de item
+router.put("/desfazer/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const item = await Item.findByIdAndUpdate(
+      id,
+      { concluido: false },
+      { new: true }
+    );
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ erro: "Erro ao desfazer conclusão do item" });
+  }
+});
+
 
 // Atualizar um item
 router.put("/atualizar/:id", async (req, res) => {

@@ -17,11 +17,19 @@
 
     <!-- Próximo planejamento -->
     <section id="proximo">
-      <h2>📅 Próximo Planejamento</h2>
-      <div id="proximo-planejamento" class="proximo-box">
-        <p>Nenhum planejamento pendente.</p>
+      <div class="item-header">
+        <span class="item-text">
+          <i class="ph ph-pin"></i>
+          <span id="proximo-planejamento-texto">Texto da tarefa</span>
+        </span>
+      </div>
+      <div class="item-description" id="proximo-planejamento-descricao">Descrição</div>
+      <div class="item-date" id="proximo-planejamento-data">00/00/0000</div>
+      <div class="item-encarregados" id="proximo-planejamento-encarregados">
+        <i class="ph ph-user"></i> Encarregado
       </div>
     </section>
+    
 
     <!-- Categorias -->
     <section id="categorias">
@@ -98,6 +106,10 @@
         <i class="ph ph-user"></i>
         <input type="text" id="encarregados" placeholder="Encarregado(s) (separar por vírgula)" />
       </div>
+      <div class="campo">
+        <i class="ph ph-lock"></i>
+        <input type="password" id="codigoAcesso" placeholder="Código de acesso" required>
+      </div>      
       <button onclick="adicionarTexto()">
         <i class="ph ph-plus"></i> Adicionar novo item
       </button>
@@ -108,13 +120,6 @@
         <i class="ph ph-file-pdf"></i> Exportar Tarefas Pendentes (PDF)
       </button>      
     </div>
-
-    <div id="debug" style="margin-top: 24px; text-align: center;">
-      <button id="btnResetarBanco" class="debug-btn">
-        🧹
-      </button>
-    </div>
-    
 
     <div id="toast-container"></div>
 

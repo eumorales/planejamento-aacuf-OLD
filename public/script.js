@@ -41,20 +41,21 @@ function mostrarToast(mensagem, tipo = "success") {
     toast.remove();
   }, 3000);
 }
-
 async function adicionarTexto() {
   const texto = document.getElementById("texto").value.trim();
   const categoria = document.getElementById("categoria").value.trim();
   const dataLimite = document.getElementById("dataLimite").value.trim();
   const encarregadosInput = document.getElementById("encarregados")?.value?.trim();
   const descricao = document.getElementById("descricao")?.value?.trim();
+  const acesso = document.getElementById("codigoAcesso")?.value.trim();
 
   // Verifica se os campos obrigatórios foram preenchidos
-  if (!texto || !categoria || !dataLimite) {
+  if (!texto || !categoria || !dataLimite || !acesso) {
     mostrarToast("Preencha todos os campos obrigatórios!", "error");
     return;
   }
 
+  // Validação de data (DD/MM/AAAA)
   const regexData = /^\d{2}\/\d{2}\/\d{4}$/;
   if (!regexData.test(dataLimite)) {
     mostrarToast("Formato de data inválido. Use: dia/mês/ano", "error");
@@ -74,6 +75,7 @@ async function adicionarTexto() {
       descricao,
       dataLimite,
       encarregados,
+      acesso
     }),
   });
 
@@ -82,12 +84,17 @@ async function adicionarTexto() {
     document.getElementById("dataLimite").value = "";
     if (document.getElementById("descricao")) document.getElementById("descricao").value = "";
     if (document.getElementById("encarregados")) document.getElementById("encarregados").value = "";
+    if (document.getElementById("codigoAcesso")) document.getElementById("codigoAcesso").value = "";
+
     carregarTextos();
     mostrarToast("Item adicionado!");
   } else {
-    mostrarToast("Erro ao adicionar item.", "error");
+    const res = await response.json();
+    const erro = res?.erro || "Erro ao adicionar item.";
+    mostrarToast(erro, "error");
   }
 }
+
 
 
 function criarElementoAnotacao(anotacao, li) {
@@ -107,59 +114,98 @@ function criarElementoAnotacao(anotacao, li) {
   });
   return noteElement;
 }
-
-function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluido = false, dataLimite = null, encarregados = []) {
-  const li = document.createElement("li");
+function criarItemElemento(texto, descricao, id = null, anotacoes = [], concluido = false, dataLimite = null, encarregados = [], destaque = false) {
+  const li = document.createElement(destaque ? "div" : "li");
   if (id) li.dataset.id = id;
-
-  let encarregadosHTML = "";
-  if (encarregados.length > 0) {
-    encarregadosHTML = `<div class="item-encarregados"><i class='ph ph-user'></i> ${encarregados.join(", ")}</div>`;
-  }
 
   li.innerHTML = `
     <div class="item-header">
-      <span class="item-text">${texto}</span>
-      <div class="item-actions">
-        <button class="btn-edit"><i class="ph ph-pencil-simple"></i></button>
-        <button class="btn-note"><i class="ph ph-note"></i></button>
-        <button class="btn-done"><i class="ph ph-check-circle"></i></button>
-      </div>
+      <span class="item-text">
+        ${destaque ? `📌 ${texto}` : texto}
+      </span>
     </div>
     <div class="item-description">${descricao || "Sem descrição"}</div>
-    ${dataLimite ? `<div class="item-date"><small><i>${dataLimite}</i></small></div>` : ""}
-    ${encarregadosHTML}
     <div class="item-notes"></div>
+    ${dataLimite ? `<div class="item-date"><i class="ph ph-calendar-blank"></i> ${dataLimite}</div>` : ""}
+    ${
+      encarregados.length
+        ? `<div class="item-encarregados"><i class="ph ph-user"></i> ${encarregados.join(", ")}</div>`
+        : ""
+    }
   `;
 
+  // Anotações
   const notesContainer = li.querySelector('.item-notes');
   anotacoes.forEach(anotacao => {
-    const noteElement = criarElementoAnotacao(anotacao, li);
+    const noteElement = document.createElement('div');
+    noteElement.className = 'note';
+    noteElement.innerHTML = `
+      <span>${anotacao}</span>
+      ${!destaque ? `
+      <div class="note-actions">
+        <button class="btn-remove-note"><i class="ph ph-trash"></i></button>
+      </div>` : ""}
+    `;
+
+    if (!destaque) {
+      noteElement.querySelector('.btn-remove-note').addEventListener('click', async () => {
+        mostrarToast("Anotação removida.");
+        noteElement.remove();
+        atualizarAlturaCategoria(li);
+        await salvarItemAtualizado(li);
+      });
+    } else {
+      noteElement.style.backgroundColor = "#fff";
+    }
+
     notesContainer.appendChild(noteElement);
+    
   });
 
-  li.querySelector('.btn-edit').addEventListener('click', () => editarItem(li));
-  li.querySelector('.btn-note').addEventListener('click', () => adicionarAnotacao(li));
-  li.querySelector('.btn-done').addEventListener('click', () => concluirItem(li));
+  if (!destaque) {
+    const actions = document.createElement("div");
+    actions.className = "item-actions";
+    actions.innerHTML = `
+      <button class="btn-edit"><i class="ph ph-pencil-simple"></i></button>
+      <button class="btn-note"><i class="ph ph-note"></i></button>
+      <button class="btn-done"><i class="ph ph-check-circle"></i></button>
+    `;
+    li.querySelector(".item-header").appendChild(actions);
+
+    li.querySelector('.btn-edit').addEventListener('click', () => editarItem(li));
+    li.querySelector('.btn-note').addEventListener('click', () => adicionarAnotacao(li));
+    li.querySelector('.btn-done').addEventListener('click', () => concluirItem(li));
+  }
 
   if (concluido === "expirado") {
     li.classList.add("item-expirado");
   } else if (concluido === true) {
     li.classList.add("item-concluido");
-    li.classList.remove("item-expirado");
-  
+
     const actions = li.querySelector('.item-actions');
-    actions.innerHTML = `
-      <button class="btn-undo"><i class="ph ph-arrow-counter-clockwise"></i></button>
-      <button class="btn-delete"><i class="ph ph-trash"></i></button>
-    `;
-  
-    actions.querySelector(".btn-undo").addEventListener("click", () => carregarTextos());
-    actions.querySelector(".btn-delete").addEventListener("click", () => deletarItem(li));
+    if (actions) {
+      actions.innerHTML = `
+        <button class="btn-undo"><i class="ph ph-arrow-counter-clockwise"></i></button>
+        <button class="btn-delete"><i class="ph ph-trash"></i></button>
+      `;
+
+      actions.querySelector(".btn-undo").addEventListener("click", async () => {
+        const res = await fetch(`/api/desfazer/${li.dataset.id}`, { method: "PUT" });
+        if (res.ok) {
+          mostrarToast("Item reativado!");
+          carregarTextos();
+        } else {
+          mostrarToast("Erro ao reativar item", "error");
+        }
+      });
+      
+      actions.querySelector(".btn-delete").addEventListener("click", () => deletarItem(li));
+    }
   }
-  
+
   return li;
 }
+
 
 async function salvarItemAtualizado(li) {
   const id = li.dataset.id;
@@ -229,6 +275,20 @@ async function concluirItem(li) {
 
     mostrarToast("Item concluído!");
 
+    const res = await fetch("/api/listar");
+    const data = await res.json();
+    const proximos = [];
+    
+    Object.values(data).forEach(lista => {
+      lista.forEach(item => {
+        if (item.dataLimite && !item.concluido) {
+          proximos.push(item);
+        }
+      });
+    });
+    
+    atualizarProximoPlanejamento(proximos);
+
   }
 }
 
@@ -245,6 +305,22 @@ async function deletarItem(li) {
       alert("Erro ao excluir item");
     }
   }
+
+  const resListar = await fetch("/api/listar");
+  const data = await resListar.json();
+  const proximos = [];
+  
+  Object.values(data).forEach(lista => {
+    lista.forEach(item => {
+      if (item.dataLimite && !item.concluido) {
+        proximos.push(item);
+      }
+    });
+  });
+  
+  atualizarProximoPlanejamento(proximos);
+
+  
 }
 
 function verificarCategoriaVazia(ul) {
@@ -264,7 +340,7 @@ function verificarCategoriaVazia(ul) {
 
 
 function atualizarProximoPlanejamento(lista) {
-  const container = document.getElementById("proximo-planejamento");
+  const container = document.getElementById("proximo");
   if (!container) return;
 
   if (!lista.length) {
@@ -279,12 +355,23 @@ function atualizarProximoPlanejamento(lista) {
   });
 
   const proximo = lista[0];
-  container.innerHTML = `
-    <strong>${proximo.texto}</strong><br>
-    <small>${proximo.dataLimite}</small><br>
-    ${proximo.encarregados?.length ? `<small><i class="ph ph-user"></i> ${proximo.encarregados.join(", ")}</small>` : ""}
-  `;
+
+  const itemElement = criarItemElemento(
+    proximo.texto,
+    proximo.descricao || "",
+    proximo._id,
+    proximo.anotacoes || [],
+    proximo.concluido ? true : false,
+    proximo.dataLimite,
+    proximo.encarregados || [],
+    true 
+  );
+
+  container.innerHTML = "";
+  container.appendChild(itemElement);
 }
+
+
 
 async function carregarTextos() {
   try {
